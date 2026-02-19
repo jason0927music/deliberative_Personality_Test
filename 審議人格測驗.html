@@ -1,0 +1,641 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>台大民主審議社－審議人格測驗</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@400;700;900&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --bg-color: #f4f5f7; 
+            --paper-color: #ffffff; 
+            --text-color: #2c3e50; 
+            --accent-color: #c0392b; 
+            --border-color: #dcdde1;
+            --shadow-light: rgba(0, 0, 0, 0.05);
+            --shadow-dark: rgba(0, 0, 0, 0.15);
+        }
+        
+        body {
+            font-family: 'Noto Serif TC', 'PingFang TC', 'Microsoft JhengHei', serif;
+            background-color: var(--bg-color);
+            background-image: 
+                linear-gradient(90deg, transparent 95%, rgba(0,0,0,0.02) 100%),
+                linear-gradient(0deg, transparent 95%, rgba(0,0,0,0.02) 100%);
+            background-size: 40px 40px;
+            color: var(--text-color);
+            line-height: 1.8;
+            margin: 0;
+            padding: 40px 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        #app-container {
+            max-width: 800px;
+            width: 100%;
+            background-color: var(--paper-color);
+            border: 1px solid var(--border-color);
+            border-radius: 0; 
+            padding: 50px 40px;
+            box-shadow: 
+                10px 10px 0px var(--shadow-light),
+                0 4px 15px var(--shadow-dark);
+            position: relative;
+            text-align: center;
+        }
+
+        #app-container::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            right: 0;
+            border-width: 0 50px 50px 0;
+            border-style: solid;
+            border-color: var(--bg-color) var(--bg-color) #e0e0e0 #e0e0e0;
+            box-shadow: -2px 2px 5px rgba(0,0,0,0.1);
+        }
+
+        h1 {
+            font-size: 2.2em;
+            margin-bottom: 5px;
+            letter-spacing: 2px;
+            color: var(--text-color);
+            font-weight: 900;
+        }
+        h2 {
+            font-size: 1.5em;
+            color: var(--accent-color);
+            letter-spacing: 5px;
+            margin-bottom: 15px;
+            border-bottom: 2px solid var(--accent-color);
+            display: inline-block;
+            padding-bottom: 5px;
+            font-weight: 700;
+        }
+        h3 {
+            font-size: 1.1em;
+            font-weight: 700;
+            color: #7f8c8d;
+            margin-bottom: 30px;
+        }
+
+        .hero-image, .result-image {
+            width: 100%;
+            max-width: 600px;
+            border-radius: 0;
+            border: 5px solid #fff;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+            margin-bottom: 30px;
+        }
+        
+        .hero-image {
+            border: none;
+            box-shadow: none;
+            max-width: 350px; 
+        }
+
+        .intro-text {
+            font-size: 1.15em;
+            text-align: justify;
+            margin-bottom: 30px;
+            color: #444;
+            padding: 0 20px;
+        }
+
+        .question-text {
+            font-size: 1.3em;
+            font-weight: 700;
+            margin-bottom: 30px;
+            text-align: left;
+            color: var(--text-color);
+            border-left: 6px solid var(--accent-color);
+            padding-left: 15px;
+            background-color: #fdfdfd;
+            padding: 15px;
+            box-shadow: 2px 2px 5px var(--shadow-light);
+        }
+
+        .option-btn {
+            display: block;
+            width: 100%;
+            background-color: var(--paper-color);
+            color: var(--text-color);
+            border: 1px solid var(--border-color);
+            border-radius: 0; 
+            padding: 15px 25px;
+            margin-bottom: 15px;
+            font-size: 1.05em;
+            text-align: left;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            position: relative;
+            font-family: 'Noto Serif TC', serif;
+            font-weight: 400;
+        }
+
+        .option-btn:hover {
+            background-color: #fafafa;
+            border-color: var(--text-color);
+            transform: translate(-3px, -3px);
+            box-shadow: 5px 5px 0px var(--shadow-light);
+        }
+
+        .option-btn.selected {
+            background-color: var(--accent-color);
+            color: #fff;
+            border-color: var(--accent-color);
+            transform: translate(-3px, -3px);
+            box-shadow: 5px 5px 0px rgba(192, 57, 43, 0.3);
+            font-weight: 700;
+        }
+
+        .option-btn::after {
+            content: "";
+            position: absolute;
+            bottom: 0;
+            right: 0;
+            border-width: 0 15px 15px 0;
+            border-style: solid;
+            border-color: transparent transparent var(--accent-color) transparent;
+            opacity: 0;
+            transition: opacity 0.2s;
+        }
+        .option-btn:hover::after {
+            opacity: 1;
+        }
+        .option-btn.selected::after {
+            border-color: transparent transparent #fff transparent;
+            opacity: 1;
+        }
+
+        .nav-buttons {
+            display: flex;
+            justify-content: space-between; 
+            align-items: center;
+            margin-top: 25px;
+            padding-top: 15px;
+            border-top: 1px dashed var(--border-color);
+        }
+
+        .back-btn, .confirm-btn {
+            padding: 12px 25px;
+            font-size: 1.05em;
+            cursor: pointer;
+            transition: 0.2s;
+            font-family: 'Noto Serif TC', serif;
+            font-weight: 700;
+            border-radius: 0;
+        }
+
+        .back-btn {
+            background-color: transparent;
+            color: #7f8c8d;
+            border: 1px solid #dcdde1;
+        }
+        .back-btn:hover {
+            background-color: #f4f5f7;
+            color: var(--text-color);
+            border-color: var(--text-color);
+        }
+
+        .confirm-btn {
+            background-color: var(--text-color);
+            color: #fff;
+            border: none;
+            box-shadow: 3px 3px 0px rgba(0,0,0,0.1);
+            margin-left: auto; 
+        }
+        
+        .confirm-btn:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+            box-shadow: none;
+            transform: none;
+        }
+
+        .confirm-btn:not(:disabled):hover {
+            background-color: var(--accent-color);
+            transform: translate(-2px, -2px);
+            box-shadow: 5px 5px 0px rgba(0,0,0,0.15);
+        }
+
+        #quiz-screen, #result-screen {
+            display: none;
+            animation: fadeIn 0.6s ease-in;
+        }
+
+        .result-title {
+            font-size: 2.5em;
+            color: var(--text-color);
+            margin-bottom: 10px;
+            font-weight: 900;
+        }
+        .result-subtitle {
+            font-size: 1.3em;
+            color: var(--accent-color);
+            margin-bottom: 30px;
+            font-weight: 700;
+            letter-spacing: 1px;
+        }
+
+        .result-desc {
+            font-size: 1.1em;
+            text-align: justify;
+            background: #fafafa;
+            padding: 35px 30px;
+            border: 1px solid var(--border-color);
+            box-shadow: inset 0 0 10px rgba(0,0,0,0.02);
+            margin-bottom: 0px; 
+            position: relative;
+            line-height: 2;
+        }
+        
+        .result-desc::before {
+            content: "";
+            position: absolute;
+            top: -10px;
+            left: -10px;
+            width: 30px;
+            height: 30px;
+            background-color: var(--accent-color);
+            opacity: 0.8;
+            transform: rotate(-45deg);
+        }
+
+        .result-desc strong.section-title {
+            display: block;
+            color: var(--accent-color);
+            font-size: 1.15em;
+            margin-top: 20px;
+            margin-bottom: 5px;
+            border-bottom: 1px dashed #ccc;
+            padding-bottom: 5px;
+        }
+        .result-desc strong.section-title:first-child {
+            margin-top: 0;
+        }
+
+        .result-quote {
+            background-color: var(--text-color);
+            color: #ecf0f1;
+            padding: 30px 40px;
+            margin-bottom: 40px;
+            font-size: 1.1em;
+            line-height: 1.8;
+            text-align: center;
+            position: relative;
+            box-shadow: 5px 5px 0px rgba(0,0,0,0.15);
+        }
+        .result-quote::before {
+            content: "“";
+            font-family: serif;
+            font-size: 5em;
+            color: rgba(255,255,255,0.1);
+            position: absolute;
+            top: -10px;
+            left: 20px;
+        }
+        .result-quote .author {
+            display: block;
+            margin-top: 15px;
+            text-align: right;
+            font-size: 0.9em;
+            color: var(--accent-color);
+            font-weight: 700;
+            border-top: 1px solid rgba(255,255,255,0.2);
+            padding-top: 15px;
+        }
+        .result-quote span.foreign-text {
+            display: block;
+            font-size: 0.9em;
+            color: #bdc3c7;
+            font-style: italic;
+            margin-bottom: 8px;
+        }
+
+        .action-btn {
+            background-color: var(--text-color);
+            color: var(--paper-color);
+            border: none;
+            padding: 15px 40px;
+            font-size: 1.2em;
+            font-weight: 700;
+            border-radius: 0; 
+            cursor: pointer;
+            transition: 0.2s;
+            letter-spacing: 2px;
+            box-shadow: 4px 4px 0px rgba(0,0,0,0.1);
+            font-family: 'Noto Serif TC', serif;
+        }
+
+        .action-btn:hover {
+            background-color: var(--accent-color);
+            transform: translate(-2px, -2px);
+            box-shadow: 6px 6px 0px rgba(0,0,0,0.15);
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body>
+
+<div id="app-container">
+    
+    <div id="start-screen">
+        <h1>台大民主審議社－審議人格測驗</h1>
+        <h2>審議的考驗</h2>
+        <h3>校長：James Sunderland</h3>
+
+        <img src="https://i.ibb.co/3yZ2XF4Y/561332558-122104782423043448-2170646068631058173-n-removebg-preview.png" alt="台大民主審議社 LOGO" class="hero-image">
+
+        <div class="intro-text">
+            歡迎來到審議的十字路口。在公共哲學的領域中，每一次對話都是一場靈魂的碰撞。面對充滿爭議、沒有標準答案的社會議題，你的直覺與選擇，將深刻反映出你內在處理衝突、追求「共善」的真實樣貌。<br><br>
+            這不僅是一場測驗，更是一次挖掘你靈魂深處「民主審議人格」的旅程。準備好翻開卷宗，面對真實的自己了嗎？
+        </div>
+        
+        <button class="action-btn" onclick="startQuiz()">翻開卷宗，進入審議庭</button>
+    </div>
+
+    <div id="quiz-screen">
+        <div id="question-text" class="question-text">載入中...</div>
+        <div id="options-container"></div>
+        <div class="nav-buttons">
+            <button id="back-btn" class="back-btn" onclick="goBack()" style="display: none;">返回上一題</button>
+            <button id="confirm-btn" class="confirm-btn" onclick="confirmSelection()" disabled>確定送出</button>
+        </div>
+    </div>
+
+    <div id="result-screen">
+        <h3 style="border:none; margin-bottom:5px; color: #7f8c8d;">你靈魂深處的審議人格是...</h3>
+        <div class="result-title" id="result-title"></div>
+        <div class="result-subtitle" id="result-subtitle"></div>
+        
+        <img id="result-img" src="https://i.ibb.co/39c3Kchv/image.jpg" alt="人格形象" class="result-image">
+        
+        <div class="result-desc" id="result-desc"></div>
+        
+        <div class="result-quote" id="result-quote"></div>
+
+        <button class="action-btn" onclick="location.reload()">重新締結契約</button>
+    </div>
+
+</div>
+
+<script>
+    // 【全新完美權重分配】：primary +2分, secondary +1分。確保結果極度精細無隨機性。
+    const questions = [
+        {
+            text: "【議題一】科技與靈魂的邊界：現在 AI 越來越強，很多人直接用 AI 寫作業、甚至生成小說和畫作去參賽。你對於『在教育和創作中全面開放 AI』有什麼看法？",
+            options: [
+                { text: "應該全面擁抱 AI。它能大幅提升效率，我們該評估的是最終產出，而非死守舊過程。", traits: { primary: "數據裁決官", secondary: "落地執行官" } },
+                { text: "必須有嚴格規範和浮水印。過程不透明，對原創者就是破壞規則的作弊。", traits: { primary: "審議之星", secondary: "傳統守墓人" } },
+                { text: "AI 沒靈魂。藝術價值在於人類痛苦與生命經驗的共鳴，演算法無法取代。", traits: { primary: "靈魂傾聽人", secondary: "理想國繪卷" } },
+                { text: "『原創』是資本主義迷思。AI 剛好能摧毀僵化體制，早點崩壞早點重構！", traits: { primary: "革命的引信", secondary: "批判之刃" } },
+                { text: "工具無對錯。該發展出『人機協作』的新評分標準，找到動態平衡點。", traits: { primary: "共識縫合師", secondary: "灰燼中的天秤" } },
+                { text: "AI 是一種控制語言的權力，懂下指令的人才是贏家。而指令也可以是「原創」有原創性。", traits: { primary: "語言鍊金術士", secondary: "沉默之眼" } }
+            ]
+        },
+        {
+            text: "【議題二】生理與心理的碰撞：是否允許跨性別者在『不經過摘除生理器官手術』的情況下合法更改身分證性別？這牽涉人權與女性專屬空間的安全疑慮。你會站在哪邊？",
+            options: [
+                { text: "性別認同是個人真實體驗。強迫動手術是國家暴力，應優先接住他們的痛苦。", traits: { primary: "理想國繪卷", secondary: "靈魂傾聽人" } },
+                { text: "現有的女性法定身份與福利是源於歷史上生理女性所受的結構性壓迫。免術換會抹除這保障的初衷。", traits: { primary: "傳統守墓人", secondary: "落地執行官" } },
+                { text: "需要看國外實施後的犯罪率與空間數據，用絕對客觀的證據來制定嚴謹門檻。", traits: { primary: "數據裁決官", secondary: "審議之星" } },
+                { text: "雙方的恐懼都是真實的。應該推動性別友善第三空間，在不剝奪安全感下解決。", traits: { primary: "灰燼中的天秤", secondary: "共識縫合師" } },
+                { text: "『性別』欄本身就是監控工具。不如徹底廢除身分證性別欄，把定義權還給個人！", traits: { primary: "批判之刃", secondary: "革命的引信" } },
+                { text: "重點不在換證，在於被操作成政治對立。我暫不表態，看誰從中獲取聲量。", traits: { primary: "沉默之眼", secondary: "語言鍊金術士" } }
+            ]
+        },
+        {
+            text: "【議題三】人權的絕對矛盾：許多人基於反戰支持巴勒斯坦，但統治當地的政權在法律上會將同性戀處死。面對『受害者同時也是加害者』的極端矛盾，你的立場是？",
+            options: [
+                { text: "生命權優先。先阻止眼前的屠殺，同理難民不等於認同該政權的反同政策。", traits: { primary: "靈魂傾聽人", secondary: "共識縫合師" } },
+                { text: "徹頭徹尾的道德偽善！不可能一邊高喊人權，一邊聲援迫害同志的政權，邏輯矛盾。", traits: { primary: "批判之刃", secondary: "數據裁決官" } },
+                { text: "一碼歸一碼。嚴守國際法呼籲停火，同時透過國際法庭追究迫害 LGBTQ+ 的罪行。", traits: { primary: "審議之星", secondary: "灰燼中的天秤" } },
+                { text: "每個文化都有其殘酷脈絡。把西方的進步價值強加在戰區是不切實際的。", traits: { primary: "落地執行官", secondary: "傳統守墓人" } },
+                { text: "戰火與宗教迫害本質都是帝國主義產物。該對抗的是背後製造仇恨的全球權力結構！", traits: { primary: "革命的引信", secondary: "語言鍊金術士" } },
+                { text: "悲劇總是荒謬。我在衝突中看不到完美正義，只能默默記錄痛楚，期待未來解答。", traits: { primary: "沉默之眼", secondary: "理想國繪卷" } }
+            ]
+        },
+        {
+            text: "【議題四】轉型正義的難題：面對過去威權體制留下的歷史創傷，社會上出現了三種價值的拉扯：有人主張『必須還原絕對真相』，有人主張『應走向寬恕與和解』，也有人認為『不如專注於務實的未來發展』。你的立場是？",
+            options: [
+                { text: "真相與咎責優先。必須打開所有檔案，讓司法系統根據證據對加害者進行嚴格審判，沒有真相就沒有正義。", traits: { primary: "審議之星", secondary: "數據裁決官" } },
+                { text: "寬恕與療癒才是終點。不斷懲罰只會製造新仇恨，我們需要修復式正義，建立讓受害者傾訴、加害者懺悔的平台。", traits: { primary: "共識縫合師", secondary: "靈魂傾聽人" } },
+                { text: "清算往往淪為政治鬥爭。不如把調查的國家資源與龐大預算，直接用來實質補償受難者家屬或投入民生建設。", traits: { primary: "落地執行官", secondary: "沉默之眼" } },
+                { text: "歷史充滿灰色地帶，當年許多人只是為了生存。我們應保留記憶作為警惕，但拒絕非黑即白的獵巫行動，維持社會穩定。", traits: { primary: "灰燼中的天秤", secondary: "傳統守墓人" } },
+                { text: "沒有摧毀就沒有和解！必須徹底清算所有體制內的共犯結構，用最激烈的手段向新世代宣示對威權的絕對拒絕。", traits: { primary: "語言鍊金術士", secondary: "革命的引信" } },
+                { text: "深挖真相只會看見『平庸的邪惡』無處不在。與其無止境地咎責，不如將其化為深刻的公共哲學教材，探討人性的脆弱。", traits: { primary: "理想國繪卷", secondary: "批判之刃" } }
+            ]
+        }
+    ];
+
+    const resultData = {
+        "審議之星": {
+            title: "雅典的楷模 ‧ 審議之星",
+            subtitle: "「哪怕世界末日，也要等發言者把最後三分鐘講完。」",
+            desc: "<strong class='section-title'>【核心靈魂】</strong>你是絕對的程序正義狂熱者。在你的靈魂深處，規則與議程從來不是限制思想的框架，而是保障民主對話與弱勢發聲的最堅實基石。<br><br><strong class='section-title'>【審議桌上的光芒】</strong>在充滿情緒勒索與失控邊緣的審議桌上，你宛如定海神針。你極度尊重每個人的發言權，對於表達能力較弱或邏輯跳躍的參與者，你能展現出宛如神明般的包容力。你堅信，真正的決策無法建立在粗暴的多數決或程序的瑕疵之上。<br><br><strong class='section-title'>【推動共善的使命】</strong>身為公共哲學的推廣者，你深知我們肩負著超越單純學術討論的龐大責任。你用最嚴謹的程序守護著每一絲對話的可能，因為你明白，唯有經得起程序正義淬鍊的結論，才能真正帶領社會走向「共善」。<br><br><strong class='section-title'>【靈魂的暗角】</strong>有時過度執著於程序的完美，可能會讓你忽略了議事規則背後隱藏的權力與階級不對等。當僵化的規則成為阻礙正義彰顯的高牆時，學會適時地打破常規，將是你進階的課題。",
+            quote: "<span class='foreign-text'>Justice is the first virtue of social institutions, as truth is of systems of thought.</span>正義是社會制度的首要美德，正如真理是思想體系的首要美德。<span class='author'>—— 約翰·羅爾斯 (John Rawls)</span>"
+        },
+        "共識縫合師": {
+            title: "破曉的調停者 ‧ 共識縫合師",
+            subtitle: "「在對立的廢墟中，尋找最大公約數。」",
+            desc: "<strong class='section-title'>【核心靈魂】</strong>你擁有強大且溫和的韌性，致力於在撕裂的社會議題中尋找對話的可能。比起單一方的徹底勝利，你更在乎社會整體的存續、和諧與相互理解。<br><br><strong class='section-title'>【審議桌上的光芒】</strong>當會議氣氛火爆、雙方劍拔弩張時，你擅長釋放「強制冷卻」的結界。你能夠聽出極端言論背後的真實恐懼與需求，並精準地將兩派意見中可取的部分抽絲剝繭，縫合成一個雖然不盡完美，但卻是當下所有人都能勉強接受的折衷方案。<br><br><strong class='section-title'>【推動共善的使命】</strong>你深刻理解推廣公共哲學的核心，不在於培養出能在辯論賽中把人逼向死角的鬥士，而在於培養出能與不同價值觀的人群共存亡的公民。你用行動證明了，引導眾人在歧異中尋找「共善」，才是民主最珍貴的價值。<br><br><strong class='section-title'>【靈魂的暗角】</strong>為了維持表面的和諧與尋求交集，你有時可能會犧牲掉某些不該妥協的核心價值。在面臨絕對的大是大非（如威權壓迫）時，過度的「各打五十大板」可能會變成對弱勢的另一種殘忍。",
+            quote: "<span class='foreign-text'>La charité soulage plus les maux que l'argent.</span>慈善的行為，比金錢更能減輕他人的痛苦。<span class='author'>—— 尚-雅克·盧梭 (Jean-Jacques Rousseau)</span>"
+        },
+        "灰燼中的天秤": {
+            title: "薛丁格的騎牆派 ‧ 灰燼中的天秤",
+            subtitle: "「不到觀測的最後一刻，你永遠不知道我的底牌。」",
+            desc: "<strong class='section-title'>【核心靈魂】</strong>你擁有極為罕見的「多視角切換能力」。這並非因為你缺乏主見或隨波逐流，而是你的認知邊界比一般人寬廣太多，你能輕易地將靈魂代入不同陣營的軀殼中進行思辨。<br><br><strong class='section-title'>【審議桌上的光芒】</strong>在審議桌上，你永遠保持著一種抽離的客觀。你總是在「A的說法有道理，但B的擔憂也很真實」的疊加態中游移。這種特質讓你在面對複雜的公共議題時，不會輕易被單一意識形態或民粹綁架。你冷靜地秤量著每一方論點的重量。<br><br><strong class='section-title'>【推動共善的使命】</strong>推廣公共哲學，最怕的就是陷入封閉的同溫層。而你就是打破同溫層的最佳媒介。你展現了「共善」的基礎前提——在做出任何道德判斷之前，必須先具備看見全局、理解他者痛苦的能力。<br><br><strong class='section-title'>【靈魂的暗角】</strong>過度追求客觀與多方視角，容易讓你陷入「分析癱瘓」。在需要立刻採取行動以阻止傷害擴大的危機時刻，你的猶豫不決與不表態，可能會被外界誤解為一種冷漠與推託。",
+            quote: "<span class='foreign-text'>Utilitarianism regards our reluctance to put a monetary price on human life as an impulse we should overcome—a taboo that hinders clear thinking and rational social choice.</span>功利主義視我們在為人類生命標上價格時的猶豫退縮，為一種必須克服的衝動——一種阻礙清晰思考與理性社會抉擇的禁忌。<span class='author'>—— 邁可·桑德爾 (Michael Sandel)</span>"
+        },
+        "數據裁決官": {
+            title: "絕對理性 ‧ 數據裁決官",
+            subtitle: "「你的眼淚很動人，但這無法改變研究的 P 值。」",
+            desc: "<strong class='section-title'>【核心靈魂】</strong>你是剝除了一切感性雜訊的邏輯運算機。在你的世界裡，沒有什麼是不能被量化、不能被客觀文獻檢視的。你崇尚絕對的科學與事實。<br><br><strong class='section-title'>【審議桌上的光芒】</strong>面對高度爭議的議題，當所有人都在為了情緒和道德制高點吵得不可開交時，你總是能冷靜地攤開歷史脈絡或是冰冷的統計數據。你自帶免疫一切「情緒勒索」的被動技能，用銳利的實證主義粉碎所有經不起推敲的浪漫幻想。<br><br><strong class='section-title'>【推動共善的使命】</strong>你深知，缺乏理性基礎的公共參與只是一場暴民的狂歡。在推廣公共哲學教育的道路上，你致力於提供最堅實的知識論基礎，確保組織追求的「共善」是建立在穩固的現實之上，而非脆弱的海市蜃樓。<br><br><strong class='section-title'>【靈魂的暗角】</strong>你容易忽略「人類」本身就是充滿非理性的生物。當你過度依賴冰冷的數據時，可能會看不見數據背後活生生的苦難與歷史傷痕。有些道德與人權的價值，是永遠無法用 Excel 表格算出來的。",
+            quote: "<span class='foreign-text'>Wir müssen wissen. Wir werden wissen.</span>我們必須知道，我們必將知道。<span class='author'>—— 大衛·希爾伯特 (David Hilbert)</span>"
+        },
+        "批判之刃": {
+            title: "真理的淬鍊者 ‧ 批判之刃",
+            subtitle: "「我並非與你為敵，我是與盲目的共識為敵。」",
+            desc: "<strong class='section-title'>【核心靈魂】</strong>你是審議桌上不可或缺的防腐劑與清醒劑。在你的靈魂深處，深知「未經審視的共識，往往是獨斷的溫床」。你挑戰多數，並不是為了展現優越感，而是出於對真理與嚴謹的極度渴望。<br><br><strong class='section-title'>【審議桌上的光芒】</strong>當所有人因為氣氛或從眾心理，匆忙倒向一個看似美好的結論時，你總是那個敢於拉下煞車的人。你擅長扮演「魔鬼代言人」，用敏銳的洞察力挑出論述中的邏輯謬誤與隱藏假設。你堅信，任何無法承受思辨之火淬鍊的提案，都不配成為最終的公共決策。<br><br><strong class='section-title'>【推動共善的使命】</strong>真正的公共哲學從不畏懼質疑。你用最嚴苛的標準檢視每一項倡議，確保組織所推動的「共善」經得起社會各界的挑戰，有效防止團隊陷入「同溫層」的盲點與群體迷思。你是捍衛組織思考深度的守門員。<br><br><strong class='section-title'>【靈魂的暗角】</strong>極致的銳利有時會讓人感到刺痛。當你專注於解構邏輯時，可能會忽略了提案者背後的善意與脆弱。學會將你鋒利的批判，包裹在建設性的對話與溫暖的語氣中，能讓眾人更願意接納你的真知灼見。",
+            quote: "<span class='foreign-text'>The commonest idea we have of freedom is that of arbitrariness.</span>我們對自由最常見的觀念，就是任性。<span class='author'>—— 黑格爾 (G.W.F. Hegel)</span>"
+        },
+        "革命的引信": {
+            title: "體制崩潰 ‧ 革命的引信",
+            subtitle: "「如果這張桌子本來就是歪的，為什麼不連桌子一起掀了？」",
+            desc: "<strong class='section-title'>【核心靈魂】</strong>你的靈魂中燃燒著拒絕妥協的火焰。你有一雙能看穿結構性壓迫的銳利雙眼，對於任何形式的威權、僵化體制與不公義，都抱持著絕對的敵意與破壞欲。<br><br><strong class='section-title'>【審議桌上的光芒】</strong>在審議過程中，你最無法忍受的就是在既有腐敗框架下的「小修小補」。當大家還在討論如何微調規則時，你更傾向於提出具毀滅性的根本重構。你認為真正的民主，必須建立在徹底摧毀舊有不平等權力關係的廢墟之上。<br><br><strong class='section-title'>【推動共善的使命】</strong>你為組織注入了最純粹的動能。你時刻提醒著所有人，我們推廣公共哲學不是為了粉飾太平，而是為了看見社會最深層的結構暴力。你追求的「共善」，是帶有革命色彩的全面解放。<br><br><strong class='section-title'>【靈魂的暗角】</strong>破壞總是比建設容易。當你不斷挑戰邊界、試圖掀翻桌子時，如果沒有準備好接住體制崩塌後的混亂，最終受害最深的，往往是你最想保護的底層弱勢。",
+            quote: "<span class='foreign-text'>The victory of \"justice\" comes from struggle.</span>「正義」的勝利，來自於鬥爭。<span class='author'>—— 路易·莫里斯 (Louis Morris)</span>"
+        },
+        "靈魂傾聽人": {
+            title: "深淵的共鳴者 ‧ 靈魂傾聽人",
+            subtitle: "「在宏大的歷史敘事中，我只聽見你破碎的啜泣。」",
+            desc: "<strong class='section-title'>【核心靈魂】</strong>你擁有突破天際的共情能力，你的存在，本身就是對這個冷酷績效社會的一種溫柔反叛。你相信人心的溫度勝過一切冰冷的政策。<br><br><strong class='section-title'>【審議桌上的光芒】</strong>比起形而上的哲學理論或龐大的國家政策，你更在乎每一個具體個人的生命經驗。在面對轉型正義或弱勢人權議題時，即使是再微弱、再邊緣的聲音，也能被你精準捕捉。你認為審議民主的核心不在於辯論的輸贏，而在於相互理解的療癒過程。<br><br><strong class='section-title'>【推動共善的使命】</strong>你完美詮釋了公共哲學中最柔軟的一塊。你深知我們身負的使命，是確保在邁向「共善」的巨輪下，沒有任何一個受苦的靈魂被輕易碾碎。你用同理心接住那些從體制縫隙中掉落的人。<br><br><strong class='section-title'>【靈魂的暗角】</strong>過度承載他人的痛苦，容易讓你陷入情緒耗竭。同時，當你完全被個體的感性故事牽著走時，可能會難以做出對社會整體長遠有利、但短期內必須做出殘酷取捨的艱難決策。",
+            quote: "<span class='foreign-text'>L'important n'est pas de guérir, mais de vivre avec ses maux.</span>重要的不是治癒，而是帶著病痛繼續活下去。<span class='author'>—— 阿爾貝·卡繆 (Albert Camus)</span>"
+        },
+        "語言鍊金術士": {
+            title: "燃燒的煽動神 ‧ 語言鍊金術士",
+            subtitle: "「給我一支麥克風，我能改變整個會議的風向。」",
+            desc: "<strong class='section-title'>【核心靈魂】</strong>你是天生的演說家與氣氛製造機，擁有將枯燥政策與艱澀理論，轉化為熱血史詩的驚人語言魔力。你深知「論述」在公共場域中的權力。<br><br><strong class='section-title'>【審議桌上的光芒】</strong>即使是再好的法案或概念，如果缺乏動人的包裝，也無法激起群眾共鳴。只要你一開口，就能用極具感染力的修辭與故事，瞬間點燃眾人的熱情、改變會議的士氣。你能將冷冰冰的條文，化為推動群眾前進的實體狂熱。<br><br><strong class='section-title'>【推動共善的使命】</strong>哲學不能永遠高高在上。你是將深奧的思想「轉譯」給大眾的關鍵橋樑。你透過強大的敘事能力，讓公共哲學教育不再是象牙塔裡的清談，而是真正能走入人群、凝聚社會共識的強大武器。<br><br><strong class='section-title'>【靈魂的暗角】</strong>煽動的群眾情緒是一把難以控制的雙面刃。當你過度依賴華麗的修辭與情緒動員時，很容易讓會議流於民粹，掩蓋了真正需要冷靜思辨的政策細節與潛在風險。",
+            quote: "<span class='foreign-text'>Sincerity is the life of the highest virtue.</span>真誠，乃人生最高的美德。<span class='author'>—— 喬叟 (Geoffrey Chaucer)</span>"
+        },
+        "理想國繪卷": {
+            title: "烏托邦的幻視 ‧ 理想國繪卷",
+            subtitle: "「我的目光不在今天，而在五十年後那個純粹的世界。」",
+            desc: "<strong class='section-title'>【核心靈魂】</strong>你是浪漫的純粹主義者，擁有超越當代的宏大想像力。你的眼底，始終倒映著一個尚未到來的完美烏托邦，你不願意輕易向現實低頭。<br><br><strong class='section-title'>【審議桌上的光芒】</strong>在充滿現實算計與利益妥協的審議桌上，你的發言總是顯得格格不入，甚至有些不切實際。但正是你這種對純粹價值的堅持，拔高了整個組織的思想天際線。你堅信對話與思辨的終極目的，是為了在荒蕪中開墾出未來世代的可能性。<br><br><strong class='section-title'>【推動共善的使命】</strong>在推廣公共哲學的艱辛路途上，眾人經常因為現實的挫折而感到疲憊。而你就是引領大家不迷失方向的北極星。你時刻提醒著大家，我們追求的「共善」不僅僅是解決眼前的問題，更是為了刻畫人類文明的最高理想。<br><br><strong class='section-title'>【靈魂的暗角】</strong>因為眼光放得太遠，常常忽略了腳下的泥濘。如果你提出的願景永遠無法落地，缺乏具體的過渡方案與資源盤點，那麼這些宏大的理念最終只會淪為自我感動的空中樓閣。",
+            quote: "<span class='foreign-text'>Knowledge is the food of the soul.</span>知識，乃靈魂的食糧。<span class='author'>—— 柏拉圖 (Plato)</span>"
+        },
+        "落地執行官": {
+            title: "鋼鐵的實踐派 ‧ 落地執行官",
+            subtitle: "「別再定義名詞了，告訴我預算在哪？誰來執行？何時死線？」",
+            desc: "<strong class='section-title'>【核心靈魂】</strong>你是所有華麗倡議與哲學清談的最終收束者。沒有你的存在，所有的理想都只是白紙上的墨水。你崇尚效率、執行力與肉眼可見的成果。<br><br><strong class='section-title'>【審議桌上的光芒】</strong>你對漫無邊際的會議極度過敏。當大家還在為了一個名詞定義吵得不可開交，或者沉浸在歷史的傷痛中無法自拔時，你的大腦已經開始繪製甘特圖。你關心的是行動、是效益、是如何在有限的資源下，將理念轉化為真實世界的具體改變。<br><br><strong class='section-title'>【推動共善的使命】</strong>你深知，光有「共善」的使命感是不夠的，必須要有推動機器的齒輪。在組織推廣公共哲學教育時，你是那個確保每一場講座、每一個專案都能如期舉行、精準落地的基石。你用雙手將哲學真正拉回了地面。<br><br><strong class='section-title'>【靈魂的暗角】</strong>過度重視效率與結果，可能會讓你顯得不近人情。有時候，讓參與者充分發洩情緒、或進行看似無效率的哲學思辨，正是建立團隊共識與公民素養必經的「必要之惡」。",
+            quote: "<span class='foreign-text'>The time is always right to do what is right.</span>做正確的事，永遠都是合適的時機。<span class='author'>—— 馬丁·路德·金恩 (Martin Luther King Jr.)</span>"
+        },
+        "傳統守墓人": {
+            title: "舊日支配者 ‧ 傳統守墓人",
+            subtitle: "「所有的進步，都必須穩固地建立在既有秩序的基石之上。」",
+            desc: "<strong class='section-title'>【核心靈魂】</strong>你是歷史與經驗的捍衛者，深知人類社會結構的脆弱。你腦中裝滿了過去失敗的案例，是組織裡不可或缺的煞車皮與防護網。<br><br><strong class='section-title'>【審議桌上的光芒】</strong>面對任何激進的改變、科技的全面開放或是未知的提案，你總是抱持著高度的懷疑。你並非反對進步，而是深信「傳統」是經過無數次試錯後留下來的生存智慧。在處理歷史記憶與轉型正義時，你傾向於謹慎與保留，防止組織在狂飆的理想中失控翻車。<br><br><strong class='section-title'>【推動共善的使命】</strong>推動社會共善，不能只靠著熱血盲目往前衝。你負責將公共哲學與過去的歷史脈絡深深扣連，提醒大家任何政策的改動都會帶來長遠的連鎖反應。你確保了組織在追求進步的同時，不會遺失了文化與歷史的根基。<br><br><strong class='section-title'>【靈魂的暗角】</strong>對未知的恐懼可能會讓你成為既得利益者的無意幫兇。如果死守著不合時宜的舊規矩，拒絕任何微小的典範轉移，你將可能扼殺組織演進與社會重生的關鍵契機。",
+            quote: "<span class='foreign-text'>People often call arbitrariness freedom as well... choice and self-determination do not arise from the rationality of the will, but from contingent motives.</span>人們往往把任性也稱作自由，但是任性只是非理性的自由；人性的選擇與自決，並非源自意志的理性，而是出自偶然的動機，以及這種動機對感性外在世界的依賴。<span class='author'>—— 黑格爾 (G.W.F. Hegel)</span>"
+        },
+        "沉默之眼": {
+            title: "虛空的觀測者 ‧ 沉默之眼",
+            subtitle: "「我在暗處凝視一切破綻，只為在最後一刻給予致命一擊。」",
+            desc: "<strong class='section-title'>【核心靈魂】</strong>你是審議庭上最深不可測的存在。當所有人都在為了麥克風的發言權爭奪不休時，你選擇退居背景，化身為絕對冷靜的觀測者與記錄者。<br><br><strong class='section-title'>【審議桌上的光芒】</strong>你幾乎不發一語，但大腦卻在高速運轉，默默記錄著場上所有人的發言邏輯、情緒破綻與利益矛盾。你從不浪費子彈在無意義的口水戰中，總是等到大家筋疲力盡、爭論陷入死局的最後一刻，才冷冷地拋出那句統整全局、且無人能夠反駁的致命結論。<br><br><strong class='section-title'>【推動共善的使命】</strong>在公共哲學的實踐中，太多的對話往往淪為情緒的宣洩。而你是那個能抽絲剝繭、看透事物本質的靈魂。你敏銳的觀察力，能幫助組織在混亂的社會議題中找到最精準的施力點，讓「共善」的推動不再只是瞎子摸象。<br><br><strong class='section-title'>【靈魂的暗角】</strong>過度的沉默與旁觀，可能會讓你失去與他人建立真實情感連結的機會。有時候，民主對話需要的不是一個看透一切的上帝視角，而是一個願意捲起袖子、弄髒雙手進入泥淖中與眾人共同搏鬥的真實夥伴。",
+            quote: "<span class='foreign-text'>Those who are too smart to engage in politics are condemned to being governed by those who are dumber.</span>那些自認太聰明而不願參與政治的人，終將被比他們更愚蠢的人所統治。<span class='author'>—— 柏拉圖 (Plato)</span>"
+        }
+    };
+
+    // 固定的同分決勝順序 (Deterministic Tie-breaker priority)
+    // 當出現最高分平手時，將嚴格依照此陣列的先後順序決定最終結果。
+    // 這確保了只要選擇一樣，出來的結果絕對100%一樣，沒有任何隨機性。
+    const deterministicPriority = [
+        "批判之刃", "灰燼中的天秤", "共識縫合師", "靈魂傾聽人", 
+        "沉默之眼", "理想國繪卷", "傳統守墓人", "革命的引信", 
+        "語言鍊金術士", "數據裁決官", "落地執行官", "審議之星"
+    ];
+
+    let currentQuestionIndex = 0;
+    let userSelections = [];
+    let tempSelection = null;
+
+    const startScreenEl = document.getElementById('start-screen');
+    const quizScreenEl = document.getElementById('quiz-screen');
+    const resultScreenEl = document.getElementById('result-screen');
+    const questionTextEl = document.getElementById('question-text');
+    const optionsContainerEl = document.getElementById('options-container');
+    const backBtnEl = document.getElementById('back-btn');
+    const confirmBtnEl = document.getElementById('confirm-btn');
+
+    function startQuiz() {
+        startScreenEl.style.display = 'none';
+        quizScreenEl.style.display = 'block';
+        userSelections = [];
+        currentQuestionIndex = 0;
+        loadQuestion();
+    }
+
+    function loadQuestion() {
+        optionsContainerEl.innerHTML = '';
+        const q = questions[currentQuestionIndex];
+        questionTextEl.innerText = q.text;
+        
+        tempSelection = null;
+        confirmBtnEl.disabled = true;
+
+        q.options.forEach(opt => {
+            const btn = document.createElement('button');
+            btn.className = 'option-btn';
+            btn.innerText = opt.text;
+            btn.onclick = () => selectOption(opt.traits, btn);
+            optionsContainerEl.appendChild(btn);
+        });
+
+        if (currentQuestionIndex === 0) {
+            backBtnEl.style.display = 'none';
+        } else {
+            backBtnEl.style.display = 'inline-block';
+        }
+    }
+
+    function goBack() {
+        if (currentQuestionIndex > 0) {
+            userSelections.pop(); 
+            currentQuestionIndex--; 
+            loadQuestion(); 
+        }
+    }
+
+    function selectOption(traits, btnElement) {
+        const allBtns = optionsContainerEl.querySelectorAll('.option-btn');
+        allBtns.forEach(b => b.classList.remove('selected'));
+        
+        btnElement.classList.add('selected');
+        tempSelection = traits;
+        confirmBtnEl.disabled = false;
+    }
+
+    function confirmSelection() {
+        if (!tempSelection) return;
+
+        userSelections.push(tempSelection);
+        currentQuestionIndex++;
+        
+        if (currentQuestionIndex < questions.length) {
+            loadQuestion();
+        } else {
+            showResult();
+        }
+    }
+
+    function showResult() {
+        quizScreenEl.style.display = 'none';
+        
+        // 1. 初始化分數表
+        let finalScores = {};
+        for (let key in resultData) {
+            finalScores[key] = 0;
+        }
+
+        // 2. 嚴密計算權重：Primary +2分, Secondary +1分
+        userSelections.forEach(traits => {
+            if (finalScores[traits.primary] !== undefined) {
+                finalScores[traits.primary] += 2;
+            }
+            if (finalScores[traits.secondary] !== undefined) {
+                finalScores[traits.secondary] += 1;
+            }
+        });
+
+        // 3. 找出最高分
+        let maxScore = Math.max(...Object.values(finalScores));
+        
+        // 4. 篩選出所有等於最高分的人格（處理同分平手）
+        let topTraits = Object.keys(finalScores).filter(trait => finalScores[trait] === maxScore);
+        
+        // 5. 【絕對穩定的決勝機制】：根據預先設定好的 priority 排序，取第一個
+        // 這徹底消除了 random 帶來的隨機不確定性。
+        topTraits.sort((a, b) => deterministicPriority.indexOf(a) - deterministicPriority.indexOf(b));
+        let winningTrait = topTraits[0];
+
+        const result = resultData[winningTrait];
+        
+        document.getElementById('result-title').innerText = result.title;
+        document.getElementById('result-subtitle').innerText = result.subtitle;
+        document.getElementById('result-desc').innerHTML = result.desc;
+        document.getElementById('result-quote').innerHTML = result.quote;
+        
+        resultScreenEl.style.display = 'block';
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+</script>
+
+</body>
+</html>
